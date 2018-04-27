@@ -1,0 +1,382 @@
+set shell=/bin/sh
+set smartindent
+set autoindent
+set expandtab
+set tabstop=2
+set shiftwidth=2
+set hlsearch                    " enable search highlight globally
+set incsearch                   " show matches as soon as possible
+set showmatch                   " show matching brackets when typing
+set mouse=a
+set mousehide                   " hide the mouse when typing text
+set wildignore=*.o,*.obj,*.bak,*.exe,*.a,*.svn-base
+set nobackup
+set noswapfile
+set nowrap
+"set nowrapscan                  " search till the last line, no file wrap search
+set ic
+set mousemodel=extend           " SHIFT + left mouse enabling
+set cst                         " cscope shows system defined header files
+set pastetoggle=<F2>            " autoalign while pasting from external
+"set splitright                  " move the Cursor to split window
+set statusline=%F\ %l\:%c       " display statusline with filename, line num and column number
+"set autochdir                   " change the current directory to current working directory
+"set cursorline                  " highlight the cursor line
+set previewheight=6
+set noequalalways               " split window position fixed while opening and closing split windows
+"set virtualedit=all             " virtual editting in all modes
+
+"------------------------------------------
+"remap arrow keys to do absolutely nothing:
+noremap <Up> <Nop>
+noremap <Down> <Nop>
+noremap <Left> <Nop>
+noremap <Right> <Nop>
+
+inoremap <C-h> <C-o>h
+inoremap <C-j> <C-o>j
+inoremap <C-k> <C-o>k
+inoremap <C-l> <C-o>l
+"--------------------------------------------
+"map <C-]> :vsp <CR>:exec("tag ".expand("<cword>"))<CR>
+map <silent> <F8>  :echo printf("%d", expand("<cword>"))<CR>
+map <silent> <F4>  :q!<CR>
+map <silent> <F6>  :vs<CR>
+map <silent> <C-h> :e %<.h<CR>
+map <silent> <C-c> :e %<.cc<CR>
+map <silent> <C-d> :e %:p:h<CR>
+map <silent> <S-b> :Bufferlist<CR>
+map <silent> <S-e> :tabedit%<CR>
+map <silent> <Space> :noh<CR>
+"------------------------------------------
+" default content to newly created files
+autocmd bufnewfile *.cc source ~/.cc_default_content.cc
+autocmd bufnewfile *.cc exe "%s/classname/".expand("%:t:r")
+"------------------------------------------
+highlight Ifspace    term=reverse cterm=bold ctermfg=7 ctermbg=1 guifg=White guibg=Red
+match Ifspace   'if('              " Error if no space after if statment
+"highlight Forspace   ctermfg=7 ctermbg=1 guifg=White guibg=Red
+"highlight Tailspace  ctermfg=7 ctermbg=1 guifg=White guibg=Red
+"highlight Line80     ctermfg=7 ctermbg=1 guifg=White guibg=Red
+"match Line80    '\%>80v.\+'        " Error if code goes more than 80 chars in a line
+"match Forspace  'for('             " Error if no space after for statment
+"match Tailspace /\s\+\%#\@<!$/     " Error if trailing spaces at the end of line
+
+"------------------------------------------
+colorscheme morning
+"set guifont=courier_new:h9:w5
+set guifont=Monospace\ 9
+highlight Cursor guifg=White guibg=Blue
+"let $SRC_PATH='project path'
+" change the directory for only .cc, .h files only
+if match(expand('%'), '.cc$') != -1 || match(expand('%'), '.h$') != -1
+  cd $SRC_PATH
+endif
+
+set tags=$SRC_PATH/tags
+"--------------------------------------------
+"cscope reset $SRC_PATH/cscope.out
+"cscope add $SRC_PATH/cscope.out
+set nocscopeverbose
+let $CSCOPE_DB=$SRC_PATH."/cscope.out"
+"
+if has("cscope")
+  " check cscope for definition of a symbol before checking ctags: set to 1
+  set csto=0
+  " add any cscope database in current directory
+  if filereadable("cscope.out")
+    cs add cscope.out
+  " else add the database pointed to by environment variable
+  elseif $CSCOPE_DB != ""
+    cs add $CSCOPE_DB
+  endif
+endif
+"
+"-------------------------------------------
+" VimGrep plugin...
+"let Grep_Null_Device = 'NUL'
+let Grep_Find_Use_Xargs = 0
+let Grep_Skip_Files = '*test.*'
+let Grep_Default_Filelist = '*.c *.cc *.h *.go'
+let Grep_Default_Search_Path = ''
+"let Grep_Default_Search_Path = '$SRC_PATH'
+let Grep_Path = 'grep'
+let Grep_Find_Path = 'find'
+let Grep_Xargs_Path = 'xargs'
+map <silent> <F3> :Rgrep<CR>
+source ~/.vim/plugin/grep.vim
+"To Search in current working directory
+map <silent> <F5> :call RunMessageLogs()<CR>
+function! RunMessageLogs()
+  set autochdir
+  let g:Grep_Default_Options = '-i'
+  "let g:Grep_Default_Search_Path = expand('%:p:h')
+  "let cmd = " find . -name messages* "
+  "let file_list = system(cmd)
+  "argadd file_list
+  let g:Grep_Default_Search_Path = '.'
+  let g:Grep_Default_Filelist = 'messages*'
+endfunction
+" To add the file to argument_list
+" :argadd %
+" List files from argument_list
+" :args
+"
+" % current open file
+" ## files from argument_list
+"-------------------------------------------
+" TAGLIST plugin...
+let Tlist_Ctags_Cmd = 'ctags'
+let Tlist_Auto_Open = 0
+let Tlist_File_Fold_Auto_Close = 1
+let Tlist_Auto_Highlight_Tag = 1
+let Tlist_Use_Right_Window = 1
+source ~/.vim/plugin/taglist.vim
+
+"-------------------------------------------
+" NERDTree plugin...
+"let loaded_nerd_tree = 1
+"let loaded_nerdtree_exec_menuitem = 0
+"let loaded_nerdtree_fs_menu = 0
+let NERDTreeWinPos='right'
+"let NERDTreeMirror=0
+"map <silent> <C-t> :NERDTree<CR>
+"map <silent> <C-m> :NERDTreeMirror<CR>
+"source ~/.vim/plugin/NERD_tree.vim
+"-------------------------------------------
+"Multiple search plugin...
+let MultipleSearchMaxColors = 8
+let MultipleSearchColorSequence = "lightgreen,lightblue,lightred,cyan,lightmagenta,brown,red,grey"
+let MultipleSearchTextColorSequence = "black,black,black,black,black,white,white,white"
+map <silent> \<S-Space> :SearchBuffersReset<CR>
+source ~/.vim/plugin/MultipleSearch.vim
+source ~/.vim/plugin/autoload/MultipleSearch.vim
+noh
+SearchBuffersReset
+if match(expand('%'), 'messages') != -1
+  "syntax off
+  Search ^.*ap-controller\[.*$
+  Search ^.*ap-monitor\[.*$
+  Search ^.*ap-dns\[.*$
+  Search device_registration_info.cc
+  Search xmpp_channel.cc
+endif
+"-------------------------------------------
+" indent a line
+map <silent> <F7> :call IndentLine()<CR>
+function! IndentLine()
+  let line = getline('.')
+  let count_ = len(split(line, '"', 1)) - 1
+  "let line = substitute(line, '\"', "", "g")
+  let line = "\"" . line . "\""
+  if count_ % 2 != 0
+    let line = line . "\""
+  endif
+  let tmpfile = tempname()
+  let cmd = "python $SRC_PATH/../workspace/python/file_indent.py " . line
+  exe "redir! > " . tmpfile
+  "silent echon "[=> command: " . cmd . "]\n"
+  let cmd_output = system(cmd)
+  silent echon cmd_output
+  redir END
+  execute "silent! cgetfile " . tmpfile
+  vertical copen
+  call delete(tmpfile)
+endfunction
+"
+"-------------------------------------------
+" winresizer plugin
+let g:winresizer_enable=1
+source ~/.vim/plugin/winresizer.vim
+"
+"-------------------------------------------
+" Source Explorer plugin...
+" // The switch of the Source Explorer
+"nmap <F8> :SrcExplToggle<CR>
+" // Set the height of Source Explorer window
+"let g:SrcExpl_winHeight = 8
+" // Set 100 ms for refreshing the Source Explorer
+"let g:SrcExpl_refreshTime = 100
+" // Set "Enter" key to jump into the exact definition context
+" let g:SrcExpl_jumpKey = "<ENTER>"
+" // Set "Space" key for back from the definition context
+"let g:SrcExpl_gobackKey = "<SPACE>"
+" // In order to Avoid conflicts, the Source Explorer should know what plugins
+" // are using buffers. And you need add their bufname into the list below
+" // according to the command ":buffers!"
+"let g:SrcExpl_pluginList = [
+"        \ "__Tag_List__",
+"        \ "_NERD_tree_",
+"        \ "Source_Explorer"
+"    \ ]
+" // Enable/Disable the local definition searching, and note that this is not
+" // guaranteed to work, the Source Explorer doesn't check the syntax for now.
+" // It only searches for a match with the keyword according to command 'gd'
+"let g:SrcExpl_searchLocalDef = 1
+" // Do not let the Source Explorer update the tags file when opening
+"let g:SrcExpl_isUpdateTags = 0
+" // Use 'Exuberant Ctags' with '--sort=foldcase -R .' or '-L cscope.files' to
+" //  create/update a tags file
+"let g:SrcExpl_updateTagsCmd = "ctags --sort=foldcase -R ."
+" // Set "<F12>" key for updating the tags file artificially
+"let g:SrcExpl_updateTagsKey = "<F12>"
+"-------------------------------------------
+"trinity plugin...
+"
+" Open and close all the three plugins on the same time
+"nmap <F8>   :TrinityToggleAll<CR>
+" Open and close the srcexpl.vim separately
+"nmap <F9>   :TrinityToggleSourceExplorer<CR>
+" Open and close the taglist.vim separately
+"nmap <F10>  :TrinityToggleTagList<CR>
+" Open and close the NERD_tree.vim separately
+"nmap <F11>  :TrinityToggleNERDTree<CR>
+"-------------------------------------------
+"
+"neocomplete plgin
+"
+""Note: This option must be set in .vimrc(_vimrc).  NOT IN .gvimrc(_gvimrc)!
+" Disable AutoComplPop.
+let g:acp_enableAtStartup = 0
+" Use neocomplete.
+let g:neocomplete#enable_at_startup = 1
+" Use smartcase.
+let g:neocomplete#enable_smart_case = 1
+"-------------------------------------------
+call plug#begin('~/.vim/plugged')
+
+" Shorthand notation; fetches https://github.com/junegunn/vim-easy-align
+Plug 'junegunn/vim-easy-align'
+
+" NERD tree will be loaded on the first invocation of NERDTreeToggle command
+"Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
+
+Plug 'fatih/vim-go'
+
+Plug 'artur-shaik/vim-javacomplete2'
+
+Plug 'derekwyatt/vim-scala'
+
+set nocompatible
+filetype plugin on
+let g:go_disable_autoinstall = 0
+let g:go_highlight_functions = 1
+let g:go_highlight_methods = 1
+let g:go_highlight_structs = 1
+let g:go_highlight_interfaces = 1
+let g:go_highlight_operators = 1
+let g:go_highlight_build_constraints = 1
+
+let g:go_def_mapping_enabled = 1
+let g:go_autodetect_gopath = 0
+let g:go_gocode_autobuild = 1
+let g:go_get_update = 1
+call plug#end()
+"------------------------------------------
+" compiling and running current programs
+map <silent> <S-r> :call CompileAndRun()<CR>
+function! CompileAndRun()
+  set autochdir
+  let cmd = ""
+  if expand('%') =~ '\.c$'
+    " gcc % && ./a.out && rm ./a.out
+    let g:cmd = "gcc " . expand('%') . " && ./a.out && rm ./a.out"
+  elseif expand('%') =~ '\.cc$' || expand('%') =~ '.cpp$'
+    " g++ % -std=c++11 && ./a.out && rm ./a.out
+    let g:cmd = "g++ " . expand('%') . " -std=c++11 && ./a.out && rm ./a.out"
+  elseif expand('%') =~ '\.java$'
+    " javac % && java %< && rm *.class
+    let g:cmd = "javac " . expand('%') . " && java " . expand('%<') . " && rm *.class"
+  elseif expand('%') =~ '\.scala$'
+    " scala %
+    let g:cmd = "scala " . expand('%')
+  elseif expand('%') =~ '\.go$'
+    " GoRun %
+    let g:cmd = "GoRun " . expand('%')
+  endif
+  echo system(g:cmd)
+endfunction
+
+"find and replace in all open buffers
+":bufdo %s/pattern/replace/ge | update
+"------------------------------------------
+"git diff tool
+"-------------
+"git config diff.tool gvimdiff
+"git difftool
+"------------------------------------------
+"cat ap-wireless.txt | sed -n -e 's/.*\(\/\w\+\.cc\).*/\1/p'
+"sed -e 's/\(linearhistogram\w\+\.\w\+\s\+[[:digit:]]\+\s\+[[:digit:]]\+\)/\1\n/g'
+"
+"cat typescript | grep -E 'Query time: [0-9]{4}' " search digits with grep
+"
+"find and replace the VLOG(1) in *.cc files
+"find . \( -name "*.cc" -o -name "*.h" \) -exec sed -i 's/VLOG(1)/LOG(INFO) << "GES_TEST "/' {} +
+" Here using + instead of \; to avoid running one sed invocation per file
+" -i => edit files in place
+"-------------------------------------------
+"Split window moving
+"
+"Vertical to Horizontal => C-w K    /   :wincmd K
+"Vertical to Horizontal => C-w J
+
+"Horizontal to Vertical => C-w H
+"Horizontal to Vertical => C-w L
+
+"Swap the two bufferes  => C-w r
+"
+"-------------------------------------------
+"tagsrch.txt
+":il
+":ilist
+"
+"-------------------------------------------
+"Toggle between the .cc to .h fileo
+":e %:r.cpp
+":e %<.cpp
+"
+"       where
+"       % is shorthand for current filename.
+"       :r removes the extension
+"       .cpp simply appends that string at the end.
+":e CTRL-D => displays the files in the current directory
+"find . -type f ! -name "*.*" -o -type f -name "*.*" | xargs grep "<word>"
+"-------------------------------------------
+"Search between the two line numbers
+"/\%>199l\%<300l<pattern>
+"
+"Search from a line to file end
+"/\%>7865l<pattern>
+"
+"Search from a line to file begin
+"/\%<7865l<pattern>
+"
+"Search between the two marks
+"\%>'a\%<'e<pattern>
+"-------------------------------------------
+"Set all options, except terminal options, to their default value.
+"The values of 'term', 'lines' and 'columns' are not changed. {not in Vi}
+"
+"set all&
+"
+"-------------------------------------------
+"vim commmand mode shortcuts
+" Up     Ctrl+P
+" Down   Ctrl+N
+" Left   Ctrl+B
+" Right  Ctrl+F
+" Home   Ctrl+A
+" End    Ctrl+E
+" Delete Ctrl+D
+"
+"
+" yank => <C-r> "
+"
+" Regular expression match
+" wlan-2400mhz 55 0 150 151
+" wlan-5000mhz 55 0 150 151
+" wlan-\d\+mhz[ 0-9]\+  (or)  wlan-[ a-z0-9]\+
+"
+" Sorting columns of text in Vim using sort
+" :%!column -t
+"	:sort /.*\%10v/
