@@ -284,6 +284,9 @@ function! CompileAndRun()
   elseif expand('%') =~ '\.cc$' || expand('%') =~ '.cpp$'
     " g++ % -std=c++11 && ./a.out && rm ./a.out
     let g:cmd = "g++ " . expand('%') . " -std=c++11 && ./a.out && rm ./a.out"
+  elseif expand('%') =~ '\.py$'
+    " python %
+    let g:cmd = "python " . expand('%')
   elseif expand('%') =~ '\.java$'
     " javac % && java %< && rm *.class
     let g:cmd = "javac " . expand('%') . " && java " . expand('%<') . " && rm *.class"
@@ -292,7 +295,7 @@ function! CompileAndRun()
     let g:cmd = "scala " . expand('%')
   elseif expand('%') =~ '\.go$'
     " GoRun %
-    let g:cmd = "GoRun " . expand('%')
+    let g:cmd = "go run " . expand('%')
   endif
   echo system(g:cmd)
 endfunction
@@ -380,3 +383,4 @@ endfunction
 " Sorting columns of text in Vim using sort
 " :%!column -t
 "	:sort /.*\%10v/
+"	https://jordanelver.co.uk/blog/2014/03/12/sorting-columnds-of-text-in-vim-using-sort/
