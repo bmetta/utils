@@ -1,8 +1,9 @@
 set shell=/bin/sh
 set smartindent
 set autoindent
-set expandtab
+"set expandtab
 set tabstop=2
+set noexpandtab
 set shiftwidth=2
 set hlsearch                    " enable search highlight globally
 set incsearch                   " show matches as soon as possible
@@ -25,6 +26,7 @@ set statusline=%F\ %l\:%c       " display statusline with filename, line num and
 set previewheight=6
 set noequalalways               " split window position fixed while opening and closing split windows
 "set virtualedit=all             " virtual editting in all modes
+set nocompatible
 
 "------------------------------------------
 "remap arrow keys to do absolutely nothing:
@@ -45,16 +47,21 @@ map <silent> <F6>  :vs<CR>
 map <silent> <C-h> :e %<.h<CR>
 map <silent> <C-c> :e %<.cc<CR>
 map <silent> <C-d> :e %:p:h<CR>
-map <silent> <S-b> :Bufferlist<CR>
+"map <silent> <S-b> :Bufferlist<CR>
+map <silent> <S-b> :buffers<CR>
 map <silent> <S-e> :tabedit%<CR>
 map <silent> <Space> :noh<CR>
 "------------------------------------------
 " default content to newly created files
-autocmd bufnewfile *.cc source ~/.cc_default_content.cc
-autocmd bufnewfile *.cc exe "%s/classname/".expand("%:t:r")
+"
+"autocmd bufnewfile *.cc source ~/.cc_default_content.cc
+"autocmd bufnewfile *.cc exe "%s/classname/".expand("%:t:r")
+"autocmd bufnewfile *.go source ~/.go_default_content.go
+"
 "------------------------------------------
-highlight Ifspace    term=reverse cterm=bold ctermfg=7 ctermbg=1 guifg=White guibg=Red
-match Ifspace   'if('              " Error if no space after if statment
+"
+"highlight Ifspace    term=reverse cterm=bold ctermfg=7 ctermbg=1 guifg=White guibg=Red
+"match Ifspace   'if('              " Error if no space after if statment
 "highlight Forspace   ctermfg=7 ctermbg=1 guifg=White guibg=Red
 "highlight Tailspace  ctermfg=7 ctermbg=1 guifg=White guibg=Red
 "highlight Line80     ctermfg=7 ctermbg=1 guifg=White guibg=Red
@@ -63,10 +70,11 @@ match Ifspace   'if('              " Error if no space after if statment
 "match Tailspace /\s\+\%#\@<!$/     " Error if trailing spaces at the end of line
 
 "------------------------------------------
-colorscheme morning
+"colorscheme morning
+"
 "set guifont=courier_new:h9:w5
-set guifont=Monospace\ 9
-highlight Cursor guifg=White guibg=Blue
+"set guifont=Monospace\ 9
+"highlight Cursor guifg=White guibg=Blue
 "let $SRC_PATH='project path'
 " change the directory for only .cc, .h files only
 if match(expand('%'), '.cc$') != -1 || match(expand('%'), '.h$') != -1
@@ -74,7 +82,10 @@ if match(expand('%'), '.cc$') != -1 || match(expand('%'), '.h$') != -1
 endif
 
 set tags=$SRC_PATH/tags
+"
 "--------------------------------------------
+"cscope settings
+"
 "cscope reset $SRC_PATH/cscope.out
 "cscope add $SRC_PATH/cscope.out
 set nocscopeverbose
@@ -94,9 +105,11 @@ endif
 "
 "-------------------------------------------
 " VimGrep plugin...
+"
 "let Grep_Null_Device = 'NUL'
-let Grep_Find_Use_Xargs = 0
+let Grep_Find_Use_Xargs = 1
 let Grep_Skip_Files = '*test.*'
+let Grep_Skip_Dirs = 'tools'
 let Grep_Default_Filelist = '*.c *.cc *.h *.go'
 let Grep_Default_Search_Path = ''
 "let Grep_Default_Search_Path = '$SRC_PATH'
@@ -124,28 +137,34 @@ endfunction
 "
 " % current open file
 " ## files from argument_list
+"
 "-------------------------------------------
-" TAGLIST plugin...
+" TAGLIST plugin
+"
 let Tlist_Ctags_Cmd = 'ctags'
 let Tlist_Auto_Open = 0
 let Tlist_File_Fold_Auto_Close = 1
 let Tlist_Auto_Highlight_Tag = 1
-let Tlist_Use_Right_Window = 1
+let Tlist_Use_Right_Window = 0
 source ~/.vim/plugin/taglist.vim
-
+"
 "-------------------------------------------
-" NERDTree plugin...
+" NERDTree plugin
+"
 "let loaded_nerd_tree = 1
 "let loaded_nerdtree_exec_menuitem = 0
 "let loaded_nerdtree_fs_menu = 0
 let NERDTreeWinPos='right'
 "let NERDTreeMirror=0
-"map <silent> <C-t> :NERDTree<CR>
-"map <silent> <C-m> :NERDTreeMirror<CR>
-"source ~/.vim/plugin/NERD_tree.vim
+map <silent> <C-t> :NERDTree<CR>
+map <silent> <C-f> :NERDTreeFind<CR>
+map <silent> <C-m> :NERDTreeMirror<CR>
+"
 "-------------------------------------------
 "Multiple search plugin...
 let MultipleSearchMaxColors = 8
+"let MultipleSearchColorSequence = "lightgreen,lightblue,lightred,cyan,lightmagenta,brown,red,grey"
+"let MultipleSearchTextColorSequence = "black,black,black,black,black,white,white,white"
 let MultipleSearchColorSequence = "lightgreen,lightblue,lightred,cyan,lightmagenta,brown,red,grey"
 let MultipleSearchTextColorSequence = "black,black,black,black,black,white,white,white"
 map <silent> \<S-Space> :SearchBuffersReset<CR>
@@ -184,10 +203,6 @@ function! IndentLine()
   call delete(tmpfile)
 endfunction
 "
-"-------------------------------------------
-" winresizer plugin
-let g:winresizer_enable=1
-source ~/.vim/plugin/winresizer.vim
 "
 "-------------------------------------------
 " Source Explorer plugin...
@@ -274,6 +289,7 @@ let g:go_get_update = 1
 call plug#end()
 "------------------------------------------
 " compiling and running current programs
+"
 map <silent> <S-r> :call CompileAndRun()<CR>
 function! CompileAndRun()
   set autochdir
@@ -301,13 +317,17 @@ function! CompileAndRun()
 endfunction
 
 "find and replace in all open buffers
+"
 ":bufdo %s/pattern/replace/ge | update
+"
 "------------------------------------------
 "git diff tool
-"-------------
+"
 "git config diff.tool gvimdiff
 "git difftool
+"
 "------------------------------------------
+"
 "cat ap-wireless.txt | sed -n -e 's/.*\(\/\w\+\.cc\).*/\1/p'
 "sed -e 's/\(linearhistogram\w\+\.\w\+\s\+[[:digit:]]\+\s\+[[:digit:]]\+\)/\1\n/g'
 "
@@ -382,5 +402,30 @@ endfunction
 "
 " Sorting columns of text in Vim using sort
 " :%!column -t
-"	:sort /.*\%10v/
-"	https://jordanelver.co.uk/blog/2014/03/12/sorting-columnds-of-text-in-vim-using-sort/
+" :sort /.*\%10v/
+" https://jordanelver.co.uk/blog/2014/03/12/sorting-columnds-of-text-in-vim-using-sort/
+"
+" Merge lines without space separator
+" gJ
+" Jx
+"-----------------------------------------------
+" What makes grep consider a file to be binary?
+" To avoid grep treating file as binary use
+" grep -a
+"
+" ----------------------------------------------
+"  open new buffers
+"  :enew
+"
+"  vimdiff two buffers
+"  :windo diffthis
+"  http://vimcasts.org/episodes/comparing-buffers-with-vimdiff/
+"  :diffoff!
+"-----------------------------------------------
+" sessions
+" create
+"   :mksession! ~/vim_session
+" open
+"   :source ~/vim_session
+"   gvim -S ~/vim_session
+"
